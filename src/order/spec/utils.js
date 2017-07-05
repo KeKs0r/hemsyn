@@ -1,53 +1,49 @@
 
-function getCustomer (customer) {
+function eventStore(options, next) {
+  const events = require('./fixtures/events')
+  this.add(
+    {
+      topic: 'events',
+      cmd: 'get'
+    },
+    (msg, reply) => reply(null, events)
+  )
+  this.add(
+    {
+      topic: 'events',
+      cmd: 'add'
+    },
+    (msg, reply) => reply(null, { success: true })
+  )
+  next()
+}
+
+function stubCustomer(actStub) {
   const defaultCustomer = {
+    id: 2,
     name: 'Customer A',
     classification: 1
   }
-  this.add({
-    role: 'customer',
-    cmd: 'get'
-  }, (msg, reply) => {
-    reply(null, Object.assign({}, defaultCustomer, customer, {id: msg.id}))
-  })
-  return 'mock-customer'
+  actStub.stub({ topic: 'customer', cmd: 'get', id: 2 }, null, defaultCustomer)
 }
 
-function getEvents () {
-  const events = require('./fixtures/events')
-  this.add({
-    role: 'events',
-    cmd: 'get'
-  }, (msg, reply) => reply(events))
-  return 'mock-events'
-}
-
-function getOrder (order) {
-  this.add({
-    role: 'order',
-    cmd: 'get'
-  }, (msg, reply) => reply(order))
-  return 'mock-get-order'
-}
-
-function getProduct (product) {
+function stubProduct(actStub, product) {
   const defaultProduct = {
     name: 'Ebook',
-    price: 9.99
+    price: 9.99,
+    id: 1
   }
-
-  this.add({
-    role: 'product',
-    cmd: 'get'
-  }, (msg, reply) => {
-    reply(null, Object.assign({}, defaultProduct, product, {id: msg.id}))
-  })
-  return 'mock-product'
+  const result = Object.assign({}, defaultProduct, product)
+  actStub.stub({ topic: 'product', cmd: 'get', id: 1 }, null, result)
 }
 
 module.exports = {
-  getCustomer,
-  getProduct,
-  getEvents,
-  getOrder
+  stubCustomer,
+  stubProduct,
+  eventStore: {
+    plugin: eventStore,
+    attributes: {
+      pkg: { name: 'event-store' }
+    }
+  }
 }

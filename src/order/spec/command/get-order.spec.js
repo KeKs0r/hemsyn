@@ -1,22 +1,26 @@
-const Seneca = require('seneca')
-const Promise = require('bluebird')
-const { getEvents } = require('../utils')
+const Hemera = require('nats-hemera')
+const { eventStore } = require('../utils')
 
-const s = Seneca({ log: 'test' })
-  .test()
-  .use('seneca-joi')
-  .use(getEvents)
-  .use(require('../../command/get-order'))
-const act = Promise.promisify(s.act, {context: s})
+const nats = require('nats').connect()
+const h = new Hemera(nats, {
+  logLevel: 'error',
+  generators: true
+})
+h.use(eventStore)
+h.use(require('../../command/get-order'))
+
+beforeAll(done => h.ready(done))
+afterAll(h.close)
 
 test('Get Order', () => {
   expect.assertions(2)
-  return act({
-    role: 'order',
-    cmd: 'get',
-    order: 1
-  })
-    .then((order) => {
+  return h
+    .act({
+      topic: 'order',
+      cmd: 'get',
+      order: 1
+    })
+    .then(order => {
       expect(order).toBeTruthy()
       expect(order).toMatchObject({
         id: 1

@@ -3,27 +3,38 @@ const _ = require('lodash')
 const applyOrderEvent = require('../apply')
 
 const pattern = {
-  role: 'order',
+  topic: 'order',
   cmd: 'get',
   order: Joi.number().required()
 }
 
-function init (options) {
-  this
-    .add(pattern, (msg, reply) => {
-      this.act({
-        role: 'events',
-        cmd: 'get',
-        filter: {
-          order: msg.order
-        }
-      }, (err, events) => {
-        if (err) return reply(err)
-        const order = _.reduce(events, applyOrderEvent, {})
-        reply(null, order)
-      })
-    })
-  return 'order-confirm'
+function handler (msg, reply) {
+  this.act(
+    {
+      topic: 'events',
+      cmd: 'get',
+      filter: {
+        order: msg.order
+      }
+    },
+    (err, events) => {
+      if (err) return reply(err)
+      const order = _.reduce(events, applyOrderEvent, {})
+      reply(null, order)
+    }
+  )
 }
 
-module.exports = init
+function init (options, next) {
+  this.add(pattern, handler)
+  next && next()
+}
+
+module.exports = {
+  pattern,
+  handler,
+  plugin: init,
+  attributes: {
+    name: 'get-order'
+  }
+}
