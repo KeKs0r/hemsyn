@@ -1,17 +1,18 @@
+const Joi = require('joi')
 const { stubCustomer, stubProduct, eventStore } = require('../utils')
 const { STATUS, EVENTS } = require('../../constants')
-const Promise = require('bluebird')
 const Hemera = require('nats-hemera')
 const ActStub = require("hemera-testsuite/actStub")
+const AddStub = require("hemera-testsuite/addStub")
+const createOrder = require('../../command/create-order')
+
 
 const nats = require('nats').connect()
 const h = new Hemera(nats, {
   logLevel: 'error',
   generators: true
 })
-//h.use(getCustomer)
-//h.use(getProduct)
-h.use(require('../../command/create-order'))
+h.use(createOrder)
 h.use(eventStore)
 
 const actStub = new ActStub(h)
@@ -22,30 +23,36 @@ const stub = actStub.stub({ topic: 'events', cmd: 'add' }, null, { success: true
 beforeAll(done => h.ready(done))
 afterAll(() => h.close())
 
-describe.skip('1. Validation', () => {
-  const act = validationSeneca()
+describe('1. Validation', () => {
 
-  test('requires customer', () => {
+
+  test('requires customer', (done) => {
     expect.assertions(2)
-    return act({
+    const pattern = {
       topic: 'order',
-      cmd: 'create',
-      product: 5
-    }).catch(err => {
+      cmd: 'create'
+    }
+    const payload = { product: 5 }
+    const addStub = AddStub.run(h, pattern, payload)
+    Joi.validate(payload, addStub.schema, (err) => {
       expect(err).toBeTruthy()
-      expect(err.details.message).toMatch(/customer/)
+      expect(err.message).toMatch(/customer/)
+      done()
     })
   })
 
-  test('requires product', () => {
+  test('requires product', (done) => {
     expect.assertions(2)
-    return act({
+    const pattern = {
       topic: 'order',
-      cmd: 'create',
-      customer: 3
-    }).catch(err => {
+      cmd: 'create'
+    }
+    const payload = { customer: 5 }
+    const addStub = AddStub.run(h, pattern, payload)
+    Joi.validate(payload, addStub.schema, (err) => {
       expect(err).toBeTruthy()
-      expect(err.details.message).toMatch(/product/)
+      expect(err.message).toMatch(/product/)
+      done()
     })
   })
 })
