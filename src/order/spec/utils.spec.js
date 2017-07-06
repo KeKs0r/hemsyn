@@ -6,7 +6,7 @@ const AddStub = require('hemera-testsuite/addStub')
 const ActStub = require('hemera-testsuite/actStub')
 const { stubProduct } = require('./utils')
 
-/*
+
 test.skip('returns default product', () => {
   expect.assertions(2)
   const nats = new Nats()
@@ -60,4 +60,4 @@ test.skip('can provide product to plugin', () => {
       expect(product.name).toBe('Special Product')
     })
 })
-*/
+

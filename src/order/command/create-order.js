@@ -30,7 +30,6 @@ function handler(msg, reply) {
         id: msg.customer
       }, next)
     },
-
     product: (next) => {
       this.act({
         topic: 'product',

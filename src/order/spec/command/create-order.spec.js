@@ -24,8 +24,6 @@ beforeAll(done => h.ready(done))
 afterAll(() => h.close())
 
 describe('1. Validation', () => {
-
-
   test('requires customer', (done) => {
     expect.assertions(2)
     const pattern = {
@@ -65,9 +63,8 @@ const command = {
 }
 
 describe('3. Load Context', () => {
-
   test('Fetches Customer', () => {
-    //expect.assertions(1)
+    expect.assertions(1)
     return h.act(command)
       .then(result => {
         expect(result.customer).toMatchObject({
@@ -89,7 +86,6 @@ describe('3. Load Context', () => {
 })
 
 describe('4. Generate Events', () => {
-
   test('order.created', () => {
     expect.assertions(1)
     return h.act(command)
@@ -111,7 +107,6 @@ describe('4. Generate Events', () => {
 })
 
 describe('5. Apply Events', () => {
-
   test('apply', () => {
     expect.assertions(1)
     return h.act(command)
