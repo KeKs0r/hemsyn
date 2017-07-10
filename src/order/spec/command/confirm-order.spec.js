@@ -1,67 +1,78 @@
-const Seneca = require('seneca')
-const Promise = require('bluebird')
-const { getOrder } = require('../utils')
+const expect = require('unexpected')
+
+const Joi = require('joi')
+const Hemera = require('nats-hemera')
+const ActStub = require("hemera-testsuite/actStub")
+const AddStub = require("hemera-testsuite/addStub")
+const confirmOrder = require('../../command/confirm-order')
+
+const { stubOrder, eventStore } = require('../utils')
 const { STATUS, EVENTS } = require('../../constants')
+
+
+const nats = require('nats').connect()
+const h = new Hemera(nats, {
+  logLevel: 'error',
+  generators: true,
+  errio: {
+    include: ['_pattern']
+  }
+})
+h.use(confirmOrder)
+h.use(eventStore)
+
+before(done => h.ready(done))
+after(() => h.close())
+
+
 
 const orderFixture = {
   id: 3,
   status: STATUS.OPEN
 }
+const actStub = new ActStub(h)
+stubOrder(actStub, orderFixture)
+
+describe('1. Validation', () => {
+
+  it('Requires order', (done) => {
+    //expect.assertions(2)
+    const payload = {
+      topic: 'order',
+      cmd: 'confirm'
+    }
+    Joi.validate(payload, confirmOrder.pattern, (err) => {
+      expect(err, 'to satisfy', {
+        message: expect.it('to contain', 'order')
+      })
+      done()
+    })
+  })
+})
+
+
 
 const command = {
-  role: 'order',
+  topic: 'order',
   cmd: 'confirm',
   order: 3
 }
 
-function testSeneca () {
-  const s = Seneca({ log: 'test' })
-    .test()
-    .use('seneca-joi')
-    .use(getOrder, orderFixture)
-    .use(require('../../command/confirm-order'))
-  return Promise.promisify(s.act, {context: s})
-}
-
-function validationSeneca () {
-  const s = Seneca({ log: 'silent' })
-    .use('seneca-joi')
-    .use(require('../../command/confirm-order'))
-  return Promise.promisify(s.act, {context: s})
-}
-
-describe('1. Validation', () => {
-  const act = validationSeneca()
-
-  test('Requires order', () => {
-    expect.assertions(2)
-    return act({
-      role: 'order',
-      cmd: 'confirm'
-    })
-      .catch((err) => {
-        expect(err).toBeTruthy()
-        expect(err.details.message).toMatch(/order/)
-      })
-  })
-})
 
 describe('2. Load Aggregate', () => {
-  const act = testSeneca()
-
-  test('Fetches Order', () => {
-    expect.assertions(1)
-    return act(command)
+  it('Fetches Order', () => {
+    //expect.assertions(1)
+    return h.act(command)
       .then((result) => {
-        expect(result.order).toMatchObject(orderFixture)
+        expect(result.order, 'to satisfy', orderFixture)
       })
   })
 })
 
-describe('4. Generate Events', () => {
-  const act = testSeneca()
+describe.skip('4. Generate Events', () => {
 
-  test('Order Confirmed', () => {
+
+  it('Order Confirmed', () => {
     expect.assertions(1)
     return act(command)
       .then((result) => {
@@ -73,10 +84,9 @@ describe('4. Generate Events', () => {
   })
 })
 
-describe('5. Apply Events', () => {
-  const act = testSeneca()
+describe.skip('5. Apply Events', () => {
 
-  test('apply Order Created', () => {
+  it('apply Order Created', () => {
     expect.assertions(1)
     return act(command)
       .then((result) => {
@@ -88,6 +98,7 @@ describe('5. Apply Events', () => {
   })
 })
 
-describe('6. Commit', () => {
-  test('Commit is not yet implemented')
+describe.skip('6. Commit', () => {
+  it('Commit is not yet implemented')
 })
+

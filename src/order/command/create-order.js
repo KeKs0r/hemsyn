@@ -45,10 +45,12 @@ function handler(msg, reply) {
       const applied = applyOrderCreated(null, res.event)
       next(null, applied)
     }],
+
     commit: ['apply', 'event', (res, next) => {
       // Now we should persist the event
       this.act({ topic: 'events', cmd: 'add', events: res.event }, next)
     }]
+
   }, (err, res) => {
     if (err) return reply(err)
     // we return everything, but an API endpoint should probably clean this up

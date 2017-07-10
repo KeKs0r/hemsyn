@@ -37,9 +37,19 @@ function stubProduct(actStub, product) {
   actStub.stub({ topic: 'product', cmd: 'get', id: 1 }, null, result)
 }
 
+function stubOrder(actStub, order) {
+  const defaultOrder = {
+    id: 1
+  }
+  const result = Object.assign({}, defaultOrder, order)
+  actStub.stub({ topic: 'product', cmd: 'get', id: result.id }, null, result)
+}
+
+
 module.exports = {
   stubCustomer,
   stubProduct,
+  stubOrder,
   eventStore: {
     plugin: eventStore,
     attributes: {

@@ -1,3 +1,4 @@
+const expect = require('unexpected')
 const Joi = require('joi')
 const { stubCustomer, stubProduct, eventStore } = require('../utils')
 const { STATUS, EVENTS } = require('../../constants')
@@ -20,12 +21,12 @@ stubCustomer(actStub)
 stubProduct(actStub)
 const stub = actStub.stub({ topic: 'events', cmd: 'add' }, null, { success: true })
 
-beforeAll(done => h.ready(done))
-afterAll(() => h.close())
+before(done => h.ready(done))
+after(() => h.close())
 
 describe('1. Validation', () => {
-  test('requires customer', (done) => {
-    expect.assertions(2)
+  it('requires customer', (done) => {
+    //expect.assertions(2)
     const pattern = {
       topic: 'order',
       cmd: 'create'
@@ -33,14 +34,15 @@ describe('1. Validation', () => {
     const payload = { product: 5 }
     const addStub = AddStub.run(h, pattern, payload)
     Joi.validate(payload, addStub.schema, (err) => {
-      expect(err).toBeTruthy()
-      expect(err.message).toMatch(/customer/)
+      expect(err, 'to satisfy', {
+        message: expect.it('to contain', 'customer')
+      })
       done()
     })
   })
 
-  test('requires product', (done) => {
-    expect.assertions(2)
+  it('requires product', (done) => {
+    //expect.assertions(2)
     const pattern = {
       topic: 'order',
       cmd: 'create'
@@ -48,8 +50,9 @@ describe('1. Validation', () => {
     const payload = { customer: 5 }
     const addStub = AddStub.run(h, pattern, payload)
     Joi.validate(payload, addStub.schema, (err) => {
-      expect(err).toBeTruthy()
-      expect(err.message).toMatch(/product/)
+      expect(err, 'to satisfy', {
+        message: expect.it('to contain', 'product')
+      })
       done()
     })
   })
@@ -63,21 +66,21 @@ const command = {
 }
 
 describe('3. Load Context', () => {
-  test('Fetches Customer', () => {
-    expect.assertions(1)
+  it('Fetches Customer', () => {
+    //expect.assertions(1)
     return h.act(command)
       .then(result => {
-        expect(result.customer).toMatchObject({
+        expect(result.customer, 'to satisfy', {
           id: 2,
           name: 'Customer A'
         })
       })
   })
 
-  test('Fetches Product', () => {
-    expect.assertions(1)
+  it('Fetches Product', () => {
+    //expect.assertions(1)
     return h.act(command).then(result => {
-      expect(result.product).toMatchObject({
+      expect(result.product, 'to satisfy', {
         id: 1,
         name: 'Ebook'
       })
@@ -86,18 +89,18 @@ describe('3. Load Context', () => {
 })
 
 describe('4. Generate Events', () => {
-  test('order.created', () => {
-    expect.assertions(1)
+  it('order.created', () => {
+    //expect.assertions(1)
     return h.act(command)
       .then(result => {
-        expect(result.event).toMatchObject({
+        expect(result.event, 'to satisfy', {
           type: EVENTS.ORDER_CREATED,
-          id: expect.anything(),
-          product: expect.objectContaining({
+          id: expect.it('to be ok'),
+          product: expect.it('to satisfy', {
             id: 1,
             name: 'Ebook'
           }),
-          customer: expect.objectContaining({
+          customer: expect.it('to satisfy', {
             id: 2,
             name: 'Customer A'
           })
@@ -107,17 +110,17 @@ describe('4. Generate Events', () => {
 })
 
 describe('5. Apply Events', () => {
-  test('apply', () => {
-    expect.assertions(1)
+  it('apply', () => {
+    //expect.assertions(1)
     return h.act(command)
       .then(result => {
-        expect(result.apply).toMatchObject({
-          id: expect.anything(),
-          product: expect.objectContaining({
+        expect(result.apply, 'to satisfy', {
+          id: expect.it('to be ok'),
+          product: expect.it('to satisfy', {
             id: 1,
             name: 'Ebook'
           }),
-          customer: expect.objectContaining({
+          customer: expect.it('to satisfy', {
             id: 2,
             name: 'Customer A'
           }),
@@ -128,13 +131,13 @@ describe('5. Apply Events', () => {
 })
 
 describe('6. Commit', () => {
-  test('Stored the event', () => {
-    expect.assertions(1)
+  it('Stored the event', () => {
+    //expect.assertions(1)
     return h.act(command)
       .then(res => {
         const call = stub.lastCall
-        expect(call.args[0]).toMatchObject({
-          events: expect.objectContaining({
+        expect(call.args[0], 'to satisfy', {
+          events: expect.it('to satisfy', {
             type: EVENTS.ORDER_CREATED
           })
         })
