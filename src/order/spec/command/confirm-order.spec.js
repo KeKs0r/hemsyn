@@ -12,7 +12,7 @@ const { STATUS, EVENTS } = require('../../constants')
 
 const nats = require('nats').connect()
 const h = new Hemera(nats, {
-  logLevel: 'error',
+  logLevel: 'silent',
   generators: true,
   errio: {
     include: ['_pattern']
@@ -32,6 +32,7 @@ const orderFixture = {
 }
 const actStub = new ActStub(h)
 stubOrder(actStub, orderFixture)
+const stub = actStub.stub({ topic: 'events', cmd: 'add' }, null, { success: true })
 
 describe('1. Validation', () => {
 
@@ -69,14 +70,12 @@ describe('2. Load Aggregate', () => {
   })
 })
 
-describe.skip('4. Generate Events', () => {
-
-
+describe('4. Generate Events', () => {
   it('Order Confirmed', () => {
-    expect.assertions(1)
-    return act(command)
+    //expect.assertions(1)
+    return h.act(command)
       .then((result) => {
-        expect(result.event).toMatchObject({
+        expect(result.event, 'to satisfy', {
           type: EVENTS.ORDER_CONFIRMED,
           id: command.order
         })
@@ -84,13 +83,12 @@ describe.skip('4. Generate Events', () => {
   })
 })
 
-describe.skip('5. Apply Events', () => {
-
+describe('5. Apply Events', () => {
   it('apply Order Created', () => {
-    expect.assertions(1)
-    return act(command)
+    //expect.assertions(1)
+    return h.act(command)
       .then((result) => {
-        expect(result.apply).toMatchObject({
+        expect(result.apply, 'to satisfy', {
           id: command.order,
           status: STATUS.CONFIRMED
         })
@@ -98,7 +96,18 @@ describe.skip('5. Apply Events', () => {
   })
 })
 
-describe.skip('6. Commit', () => {
-  it('Commit is not yet implemented')
+describe('6. Commit', () => {
+  it('Stored the event', () => {
+    //expect.assertions(1)
+    return h.act(command)
+      .then(res => {
+        const call = stub.lastCall
+        expect(call.args[0], 'to satisfy', {
+          events: expect.it('to satisfy', {
+            type: EVENTS.ORDER_CONFIRMED
+          })
+        })
+      })
+  })
 })
 

@@ -26,6 +26,7 @@ function confirmOrderHandler(msg, reply) {
         id: msg.order
       }, next)
     },
+
     event: ['order', (res, next) => {
       const events = applyConfirmOrder(res.order)
       next(null, events)
@@ -33,13 +34,10 @@ function confirmOrderHandler(msg, reply) {
     apply: ['event', (res, next) => {
       const applied = applyOrderConfirmed(res.order, res.event)
       next(null, applied)
-    }]
-    /*
+    }],
     commit: ['apply', 'event', (res, next) => {
-      // Now we should persist the event
-      next(null, {success: true})
+      this.act({ topic: 'events', cmd: 'add', events: res.event }, next)
     }]
-    */
   }, (err, res) => {
     if (err) return reply(err)
     // we return everything, but an API endpoint should probably clean this up

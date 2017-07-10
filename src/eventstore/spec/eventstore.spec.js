@@ -1,3 +1,7 @@
+const expect = require('unexpected').clone();
+expect.use(require('unexpected-sinon'));
+const Sinon = require('sinon')
+
 const Hemera = require('nats-hemera')
 const Promise = require('bluebird')
 
@@ -9,14 +13,14 @@ const h = new Hemera(nats, {
 h.use(require('hemera-joi'))
 h.use(require('../handlers'))
 
-beforeAll(done => h.ready(done))
-afterAll(() => h.close())
+before(done => h.ready(done))
+after(() => h.close())
 
 function noop() { }
 
 describe.skip('Validaiton', () => {
   const AddStub = require('hemera-testsuite/addStub')
-  test('Requires a valid Event', done => {
+  it('Requires a valid Event', done => {
     expect.assertions(5)
     const pattern = {
       topic: 'events',
@@ -33,7 +37,7 @@ describe.skip('Validaiton', () => {
   })
 })
 
-test('can add single event', () => {
+it('can add single event', () => {
   return h.act({
     topic: 'events',
     cmd: 'add',
@@ -45,7 +49,7 @@ test('can add single event', () => {
   })
 })
 
-test('can add multiple events', () => {
+it('can add multiple events', () => {
   return h.act({
     topic: 'events',
     cmd: 'add',
@@ -56,8 +60,8 @@ test('can add multiple events', () => {
   })
 })
 
-test('can receive filtered events', () => {
-  expect.assertions(1)
+it('can receive filtered events', () => {
+  //expect.assertions(1)
   return h
     .act({
       topic: 'events',
@@ -65,12 +69,12 @@ test('can receive filtered events', () => {
       filter: { context: 3 }
     })
     .then(events => {
-      expect(events).toHaveLength(2)
+      expect(events, 'to have length', 2)
     })
 })
 
-test('events can be observed', () => {
-  const spy1 = jest.fn()
+it('events can be observed', () => {
+  const spy1 = Sinon.spy()
   h.add(
     {
       topic: 'example',
@@ -79,7 +83,7 @@ test('events can be observed', () => {
     spy1
   )
 
-  expect.assertions(2)
+  //expect.assertions(2)
   return h
     .act({
       topic: 'events',
@@ -88,9 +92,9 @@ test('events can be observed', () => {
         type: 'example.test'
       }
     })
-    .then(() => Promise.delay(100))
+    .then(() => Promise.delay(10))
     .then(() => {
-      expect(spy1).toHaveBeenCalled()
+      expect(spy1, 'was called')
     })
     .then(() =>
       h.act({
@@ -101,8 +105,8 @@ test('events can be observed', () => {
         }
       })
     )
-    .then(() => Promise.delay(100))
+    .then(() => Promise.delay(10))
     .then(() => {
-      expect(spy1).toHaveBeenCalledTimes(1)
+      expect(spy1, 'was called times', 1)
     })
 })

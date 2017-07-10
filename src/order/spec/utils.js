@@ -42,9 +42,8 @@ function stubOrder(actStub, order) {
     id: 1
   }
   const result = Object.assign({}, defaultOrder, order)
-  actStub.stub({ topic: 'product', cmd: 'get', id: result.id }, null, result)
+  actStub.stub({ topic: 'order', cmd: 'get', id: result.id }, null, result)
 }
-
 
 module.exports = {
   stubCustomer,

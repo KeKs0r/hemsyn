@@ -1,19 +1,20 @@
+const expect = require('unexpected')
 const Hemera = require('nats-hemera')
 const { eventStore } = require('../utils')
 
 const nats = require('nats').connect()
 const h = new Hemera(nats, {
-  logLevel: 'error',
+  logLevel: 'silent',
   generators: true
 })
 h.use(eventStore)
 h.use(require('../../command/get-order'))
 
-beforeAll(done => h.ready(done))
-afterAll(h.close)
+before(done => h.ready(done))
+after(() => h.close())
 
-test('Get Order', () => {
-  expect.assertions(2)
+it('Get Order', () => {
+  //expect.assertions(2)
   return h
     .act({
       topic: 'order',
@@ -21,8 +22,7 @@ test('Get Order', () => {
       order: 1
     })
     .then(order => {
-      expect(order).toBeTruthy()
-      expect(order).toMatchObject({
+      expect(order, 'to satisfy', {
         id: 1
       })
     })

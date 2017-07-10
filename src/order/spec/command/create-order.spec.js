@@ -10,7 +10,7 @@ const createOrder = require('../../command/create-order')
 
 const nats = require('nats').connect()
 const h = new Hemera(nats, {
-  logLevel: 'error',
+  logLevel: 'silent',
   generators: true
 })
 h.use(createOrder)
