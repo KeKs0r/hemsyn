@@ -24,6 +24,7 @@ const stub = actStub.stub({ topic: 'events', cmd: 'add' }, null, { success: true
 before(done => h.ready(done))
 after(() => h.close())
 
+/*
 describe('1. Validation', () => {
   it('requires customer', (done) => {
     //expect.assertions(2)
@@ -57,6 +58,7 @@ describe('1. Validation', () => {
     })
   })
 })
+*/
 
 const command = {
   topic: 'order',
@@ -65,7 +67,7 @@ const command = {
   customer: 2
 }
 
-describe('3. Load Context', () => {
+describe('Create: 3. Load Context', () => {
   it('Fetches Customer', () => {
     //expect.assertions(1)
     return h.act(command)
@@ -77,6 +79,7 @@ describe('3. Load Context', () => {
       })
   })
 
+  /*
   it('Fetches Product', () => {
     //expect.assertions(1)
     return h.act(command).then(result => {
@@ -86,8 +89,10 @@ describe('3. Load Context', () => {
       })
     })
   })
+  */
 })
 
+/*
 describe('4. Generate Events', () => {
   it('order.created', () => {
     //expect.assertions(1)
@@ -144,3 +149,4 @@ describe('6. Commit', () => {
       })
   })
 })
+*/

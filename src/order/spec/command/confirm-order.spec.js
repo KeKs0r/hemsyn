@@ -3,7 +3,6 @@ const expect = require('unexpected')
 const Joi = require('joi')
 const Hemera = require('nats-hemera')
 const ActStub = require("hemera-testsuite/actStub")
-const AddStub = require("hemera-testsuite/addStub")
 const confirmOrder = require('../../command/confirm-order')
 
 const { stubOrder, eventStore } = require('../utils')
@@ -110,4 +109,3 @@ describe('6. Commit', () => {
       })
   })
 })
-
