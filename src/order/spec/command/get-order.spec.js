@@ -1,17 +1,29 @@
 const expect = require('unexpected')
 const Hemera = require('nats-hemera')
+const TestSuite = require('hemera-testsuite')
 const { eventStore } = require('../utils')
 
-const nats = require('nats').connect()
-const h = new Hemera(nats, {
-  logLevel: 'silent',
-  generators: true
+const uniqPort = require('uniq-port')
+const NATS_PORT = uniqPort('get-order')
+let server;
+let h;
+before(done => {
+  server = TestSuite.start_server(NATS_PORT, (err, res) => {
+    if (err) return done(err)
+    const nats = require('nats').connect(NATS_PORT)
+    h = new Hemera(nats, {
+      logLevel: 'silent',
+      generators: true
+    })
+    h.use(eventStore)
+    h.use(require('../../command/get-order'))
+    h.ready(done)
+  })
 })
-h.use(eventStore)
-h.use(require('../../command/get-order'))
-
-before(done => h.ready(done))
-after(() => h.close())
+after(() => {
+  h.close()
+  server.kill()
+})
 
 it('Get Order', () => {
   //expect.assertions(2)

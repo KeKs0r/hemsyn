@@ -31,6 +31,7 @@
     "mocha": "^3.4.2",
     "sinon": "^2.3.7",
     "unexpected": "^10.32.0",
-    "unexpected-sinon": "^10.8.1"
+    "unexpected-sinon": "^10.8.1",
+    "uniq-port": "^1.0.1"
   }
 }

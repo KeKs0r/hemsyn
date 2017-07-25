@@ -1,20 +1,33 @@
 const expect = require('unexpected').clone();
 expect.use(require('unexpected-sinon'));
 const Sinon = require('sinon')
+const TestSuite = require('hemera-testsuite')
 
 const Hemera = require('nats-hemera')
 const Promise = require('bluebird')
 
-const nats = require('nats').connect()
-const h = new Hemera(nats, {
-  logLevel: 'error',
-  generators: true
+const uniqPort = require('uniq-port')
+const NATS_PORT = uniqPort('eventstore')
+let server;
+let h;
+before(done => {
+  server = TestSuite.start_server(NATS_PORT, (err, res) => {
+    if (err) return done(err)
+    const nats = require('nats').connect(NATS_PORT)
+    h = new Hemera(nats, {
+      logLevel: 'silent',
+      generators: true
+    })
+    h.use(require('hemera-joi'))
+    h.use(require('../handlers'))
+    h.ready(done)
+  })
 })
-h.use(require('hemera-joi'))
-h.use(require('../handlers'))
+after(() => {
+  h.close()
+  server.kill()
+})
 
-before(done => h.ready(done))
-after(() => h.close())
 
 function noop() { }
 
@@ -33,7 +46,7 @@ describe.skip('Validaiton', () => {
       payload,
       noop
     )
-    //console.log(execution.schema.joi$.validate(Object.assign({}, pattern, payload)))
+    execution.schema.joi$.validate(Object.assign({}, pattern, payload))
   })
 })
 

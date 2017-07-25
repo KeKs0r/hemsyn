@@ -1,38 +1,47 @@
 const expect = require('unexpected')
-
 const Joi = require('joi')
 const Hemera = require('nats-hemera')
 const ActStub = require("hemera-testsuite/actStub")
-const AddStub = require("hemera-testsuite/addStub")
 const confirmOrder = require('../../command/confirm-order')
-
+const TestSuite = require('hemera-testsuite')
 const { stubOrder, eventStore } = require('../utils')
 const { STATUS, EVENTS } = require('../../constants')
-
-
-const nats = require('nats').connect()
-const h = new Hemera(nats, {
-  logLevel: 'silent',
-  generators: true,
-  errio: {
-    include: ['_pattern']
-  }
-})
-h.use(confirmOrder)
-h.use(eventStore)
-
-before(done => h.ready(done))
-after(() => h.close())
-
 
 
 const orderFixture = {
   id: 3,
   status: STATUS.OPEN
 }
-const actStub = new ActStub(h)
-stubOrder(actStub, orderFixture)
-const stub = actStub.stub({ topic: 'events', cmd: 'add' }, null, { success: true })
+const uniqPort = require('uniq-port')
+const NATS_PORT = uniqPort('confirm-order')
+let server;
+let h;
+let stub;
+before(done => {
+  server = TestSuite.start_server(NATS_PORT, (err, res) => {
+    if (err) return done(err)
+    const nats = require('nats').connect(NATS_PORT)
+    h = new Hemera(nats, {
+      logLevel: 'silent',
+      generators: true,
+      errio: {
+        include: ['_pattern']
+      }
+    })
+    h.use(eventStore)
+    h.use(confirmOrder)
+
+    const actStub = new ActStub(h)
+    stubOrder(actStub, orderFixture)
+    stub = actStub.stub({ topic: 'events', cmd: 'add' }, null, { success: true })
+
+    h.ready(done)
+  })
+})
+after(() => {
+  h.close()
+  server.kill()
+})
 
 describe('1. Validation', () => {
 

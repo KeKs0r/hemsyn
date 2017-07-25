@@ -5,24 +5,37 @@ const { STATUS, EVENTS } = require('../../constants')
 const Hemera = require('nats-hemera')
 const ActStub = require("hemera-testsuite/actStub")
 const AddStub = require("hemera-testsuite/addStub")
+const TestSuite = require('hemera-testsuite')
 const createOrder = require('../../command/create-order')
 
+const uniqPort = require('uniq-port')
+const NATS_PORT = uniqPort('create-order')
+let server;
+let h;
+let stub;
 
-const nats = require('nats').connect()
-const h = new Hemera(nats, {
-  logLevel: 'silent',
-  generators: true
+before(done => {
+  server = TestSuite.start_server(NATS_PORT, (err, res) => {
+    if (err) return done(err)
+    const nats = require('nats').connect(NATS_PORT)
+    h = new Hemera(nats, {
+      logLevel: 'silent',
+      generators: true
+    })
+    h.use(createOrder)
+    h.use(eventStore)
+
+    const actStub = new ActStub(h)
+    stubCustomer(actStub)
+    stubProduct(actStub)
+    stub = actStub.stub({ topic: 'events', cmd: 'add' }, null, { success: true })
+    h.ready(done)
+  })
 })
-h.use(createOrder)
-h.use(eventStore)
-
-const actStub = new ActStub(h)
-stubCustomer(actStub)
-stubProduct(actStub)
-const stub = actStub.stub({ topic: 'events', cmd: 'add' }, null, { success: true })
-
-before(done => h.ready(done))
-after(() => h.close())
+after(() => {
+  h.close()
+  server.kill()
+})
 
 describe('1. Validation', () => {
   it('requires customer', (done) => {
