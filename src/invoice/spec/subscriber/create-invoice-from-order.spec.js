@@ -1,7 +1,6 @@
 const expect = require('unexpected')
 const Hemera = require('nats-hemera')
 const ActStub = require("hemera-testsuite/actStub")
-const AddStub = require("hemera-testsuite/addStub")
 const TestSuite = require('hemera-testsuite')
 const eventStore = require('../../../eventstore/handlers')
 const { STATUS, EVENTS } = require('../../constants')

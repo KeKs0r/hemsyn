@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "./src/index.js",
+  "author": "Marc Höffl <marc.hoeffl@gmail.com>",
+  "license": "ISC",
   "scripts": {
     "start": "echo 'to be defined'",
     "test": "mocha src --recursive",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "commit-check": "npm run lint && npm run test"
   },
-  "author": "Marc Höffl <marc.hoeffl@gmail.com>",
-  "license": "ISC",
+  "pre-commit": [
+    "commit-check"
+  ],
   "dependencies": {
     "async": "^2.5.0",
     "hemera-joi": "^1.1.9",
@@ -29,6 +33,7 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
     "mocha": "^3.4.2",
+    "pre-commit": "^1.2.2",
     "sinon": "^2.3.7",
     "unexpected": "^10.32.0",
     "unexpected-sinon": "^10.8.1",

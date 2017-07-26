@@ -10,6 +10,7 @@ function apply(current, event) {
     case EVENTS.PAYMENT_RECEIVED:
       return paymentReceived(current, event)
     default:
+      //eslint-disable-next-line 
       console.warn(`Event ${event.type} not found`)
       return current
   }
