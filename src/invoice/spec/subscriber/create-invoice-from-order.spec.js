@@ -31,7 +31,7 @@ before(done => {
   })
 })
 after(() => {
-  h.close()
+  h && h.close()
   server.kill()
 })
 
@@ -43,7 +43,8 @@ const command = {
     id: 123456789,
     product: {
       id: 1,
-      name: 'Ebook'
+      name: 'Ebook',
+      price: 9.99
     },
     customer: {
       id: 2,
@@ -88,6 +89,10 @@ describe('5. Apply Events', () => {
           customer: expect.it('to satisfy', {
             id: 2,
             name: 'Customer A'
+          }),
+          price: expect.it('to satisfy', {
+            open: 9.99,
+            total: 9.99
           }),
           status: STATUS.OPEN
         })

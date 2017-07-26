@@ -24,7 +24,7 @@ before(done => {
   })
 })
 after(() => {
-  h.close()
+  h && h.close()
   server.kill()
 })
 
