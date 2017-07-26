@@ -6,7 +6,7 @@ const eventSchema = Joi.object().keys({
   type: Joi.string().trim().regex(/\./).required()
 })
 
-function initEvents (options, next) {
+function initEvents(options, next) {
   this.use(require('hemera-joi'))
   this.setOption('payloadValidator', 'hemera-joi')
 
@@ -36,10 +36,12 @@ function initEvents (options, next) {
       try {
         events.forEach(e => {
           const topic = e.type.split('.')[0]
-          const publishEvent = Object.assign({}, e, {
+          const publishEvent = {
             topic,
-            pubsub$: true
-          })
+            type: e.type,
+            pubsub$: true,
+            event: e
+          }
           if (size(this.list(publishEvent)) > 0) {
             this.act(publishEvent)
           }
