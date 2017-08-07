@@ -5,7 +5,7 @@ function applyInvoiceCreated(current, event) {
   const { price } = event.product
   const invoice = {
     id: event.id,
-    price: {
+    prices: {
       open: price,
       total: price
     },

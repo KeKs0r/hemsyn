@@ -1,6 +1,6 @@
 const Joi = require('joi')
 const _ = require('lodash')
-const applyOrderEvent = require('../apply')
+const applyInvoiceEvent = require('../apply')
 
 const pattern = {
   topic: 'invoice',
@@ -19,8 +19,11 @@ function handler(msg, reply) {
     },
     (err, events) => {
       if (err) return reply(err)
-      const order = _.reduce(events, applyOrderEvent, {})
-      reply(null, order)
+      if (_.size(events) === 0) {
+        return reply(new Error('Invoice not found'))
+      }
+      const invoice = _.reduce(events, applyInvoiceEvent, {})
+      reply(null, invoice)
     }
   )
 }

@@ -89,7 +89,7 @@ describe('5. Apply Events', () => {
             id: 2,
             name: 'Customer A'
           }),
-          price: expect.it('to satisfy', {
+          prices: expect.it('to satisfy', {
             open: 9.99,
             total: 9.99
           }),

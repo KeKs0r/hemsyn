@@ -32,12 +32,21 @@ function confirmOrderHandler(msg, reply) {
       }, next)
     },
     event: (next) => {
-      const events = applyReceivePayment(msg.invoice, msg.amount)
-      next(null, events)
+      try {
+        const events = applyReceivePayment(msg.invoice, msg.amount)
+        next(null, events)
+      } catch (e) {
+        next(e)
+      }
     },
     apply: ['event', 'invoice', (res, next) => {
-      const applied = applyPaymentReceived(res.invoice, res.event)
-      next(null, applied)
+      try {
+        const applied = applyPaymentReceived(res.invoice, res.event)
+        next(null, applied)
+      } catch (e) {
+        next(e)
+      }
+
     }],
     commit: ['apply', 'event', (res, next) => {
       this.act({ topic: 'events', cmd: 'add', events: res.event }, next)
