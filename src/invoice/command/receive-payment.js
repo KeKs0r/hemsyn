@@ -35,7 +35,7 @@ function confirmOrderHandler(msg, reply) {
       const events = applyReceivePayment(msg.invoice, msg.amount)
       next(null, events)
     },
-    apply: ['event', (res, next) => {
+    apply: ['event', 'invoice', (res, next) => {
       const applied = applyPaymentReceived(res.invoice, res.event)
       next(null, applied)
     }],

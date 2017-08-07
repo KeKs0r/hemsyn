@@ -1,13 +1,14 @@
 const { STATUS } = require('../constants')
 
 function applyPaymentReceived(c, event) {
-  const current = Object.assign({}, c)
-  current.prices.open = current.prices.open - event.amount
-  if (current.prices.open === 0) {
-    current.status = STATUS.PAID
-  } else {
-    current.status = STATUS.PARTIALLY_PAID
-  }
+  const open = c.prices.open - event.amount
+  const status = (open > 0) ? STATUS.PARTIALLY_PAID : STATUS.PAID
+  const current = Object.assign({}, c, {
+    prices: Object.assign({}, c.prices, {
+      open
+    }),
+    status
+  })
   return current
 }
 

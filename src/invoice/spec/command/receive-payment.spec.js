@@ -133,23 +133,3 @@ describe('Pay Partially', () => {
     })
   })
 })
-
-describe('Pay Rest', () => {
-  let result
-  before(() => {
-    return h.act(command)
-      .then((res) => {
-        result = res
-      })
-  })
-
-  it('4. Has Fully Paid the amount', () => {
-    expect(result.apply, 'to satisfy', {
-      id: command.invoice,
-      status: STATUS.PAID,
-      prices: expect.it('to satisfy', {
-        open: expect.it('to be', 0)
-      })
-    })
-  })
-})

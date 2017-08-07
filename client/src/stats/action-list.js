@@ -57,7 +57,7 @@ export default function StatsPage({ actions }) {
     <Shadow>
       <Table>
         <Tr>
-          <Th>Service</Th><Th>Pattern</Th>
+          <Th>Component</Th><Th>Pattern</Th>
         </Tr>
         {actionOut}
       </Table>
