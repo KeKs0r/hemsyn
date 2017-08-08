@@ -3,7 +3,7 @@ const apply = require('../../events/payment-received')
 const { STATUS, EVENTS } = require('../../constants')
 
 
-const orderFixture = {
+const invoiceFixture = {
   id: 1,
   product: 3,
   customer: 2,
@@ -19,7 +19,7 @@ it('Marks invoice as partially paid, if not fully paid', () => {
     type: EVENTS.PAYMENT_RECEIVED,
     amount: 8
   }
-  const result = apply(orderFixture, paymentReceivedEvent)
+  const result = apply(invoiceFixture, paymentReceivedEvent)
   expect(result, 'to satisfy', {
     status: STATUS.PARTIALLY_PAID,
     prices: expect.it('to satisfy', {
@@ -33,7 +33,7 @@ it('Marks invoice as fully paid, if the full amount is paid', () => {
     type: EVENTS.PAYMENT_RECEIVED,
     amount: 10
   }
-  const result = apply(orderFixture, paymentReceivedEvent)
+  const result = apply(invoiceFixture, paymentReceivedEvent)
   expect(result, 'to satisfy', {
     status: STATUS.PAID,
     prices: expect.it('to satisfy', {

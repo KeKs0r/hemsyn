@@ -5,7 +5,7 @@ const { EVENTS: ORDER_EVENTS } = require('../../order/constants')
 const applyInvoiceCreated = require('../events/invoice-created')
 
 
-function createInvoiceFromOrder({ id, customer, product }) {
+function createInvoiceFromOrder({ id, customer, product, total }) {
   const invoiceId = uuid.v4()
   const invoiceCreated = {
     type: EVENTS.INVOICE_CREATED,
@@ -14,6 +14,7 @@ function createInvoiceFromOrder({ id, customer, product }) {
     order: id,
     customer,
     product,
+    total,
   }
   return invoiceCreated
 }

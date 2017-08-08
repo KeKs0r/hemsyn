@@ -5,6 +5,8 @@ const TestSuite = require('hemera-testsuite')
 const eventStore = require('../eventstore/attach')
 const invoiceService = require('../invoice/attach')
 const orderService = require('../order/attach')
+const pricingService = require('../pricing/attach')
+
 const productStore = require('../product/store')
 const customerStore = require('../customer/store')
 
@@ -31,6 +33,7 @@ before(done => {
     eventStore(h)
     invoiceService(h)
     orderService(h)
+    pricingService(h)
 
     h.use(getProduct)
     h.use(getCustomer)
@@ -43,7 +46,7 @@ before(done => {
     })
     productStore.add({
       name: 'Ebook',
-      price: 9.99,
+      price: 10,
       id: 1
     })
 
@@ -96,7 +99,7 @@ it('Pay the invoice', () => {
   return h.act({
     topic: 'invoice',
     cmd: 'payment.receive',
-    amount: 9.99,
+    amount: 12.3,
     invoice: order.invoice
   })
 })

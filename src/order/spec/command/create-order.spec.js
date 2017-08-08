@@ -19,7 +19,7 @@ before(done => {
     if (err) return done(err)
     const nats = require('nats').connect(NATS_PORT)
     h = new Hemera(nats, {
-      logLevel: 'silent',
+      logLevel: 'error',
       generators: true
     })
     h.use(createOrder)
@@ -29,6 +29,12 @@ before(done => {
     stubCustomer(actStub)
     stubProduct(actStub)
     stub = actStub.stub({ topic: 'events', cmd: 'add' }, null, { success: true })
+    // Taxes
+    actStub.stub({
+      topic: 'tax',
+      cmd: 'calculate',
+      net: 9.99
+    }, null, { total: 12 })
     h.ready(done)
   })
 })
@@ -116,7 +122,8 @@ describe('4. Generate Events', () => {
           customer: expect.it('to satisfy', {
             id: 2,
             name: 'Customer A'
-          })
+          }),
+          total: 12
         })
       })
   })
@@ -137,7 +144,7 @@ describe('5. Apply Events', () => {
             id: 2,
             name: 'Customer A'
           }),
-          status: STATUS.OPEN
+          status: STATUS.OPEN,
         })
       })
   })

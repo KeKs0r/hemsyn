@@ -56,8 +56,9 @@ describe('Pay in two steps', () => {
       customer: 1,
       product: {
         name: 'Stuff',
-        price: 10
-      }
+        price: 9
+      },
+      total: 10
     }
     const addFixture = {
       topic: 'events',

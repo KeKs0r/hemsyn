@@ -43,12 +43,13 @@ const command = {
     product: {
       id: 1,
       name: 'Ebook',
-      price: 9.99
+      price: 8
     },
     customer: {
       id: 2,
       name: 'Customer A'
-    }
+    },
+    total: 9.99
   }
 }
 

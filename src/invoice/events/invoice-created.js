@@ -2,12 +2,12 @@ const { STATUS } = require('../constants')
 
 
 function applyInvoiceCreated(current, event) {
-  const { price } = event.product
+  const { total } = event
   const invoice = {
     id: event.id,
     prices: {
-      open: price,
-      total: price
+      open: total,
+      total: total
     },
     // prices: prices(action),
     customer: event.customer,

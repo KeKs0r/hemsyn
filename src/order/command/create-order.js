@@ -11,14 +11,15 @@ const pattern = {
   product: Joi.number().required()
 }
 
-function applyOrderCommand(customer, product) {
+function applyOrderCommand(customer, product, total) {
   const id = uuid.v4();
   const orderCreated = {
     type: EVENTS.ORDER_CREATED,
     id,
     order: id,
     customer,
-    product
+    product,
+    total,
   }
   return orderCreated
 }
@@ -39,8 +40,15 @@ function handler(msg, reply) {
         id: msg.product
       }, next)
     },
-    event: ['customer', 'product', (res, next) => {
-      const events = applyOrderCommand(res.customer, res.product)
+    taxes: ['product', (res, next) => {
+      this.act({
+        topic: 'tax',
+        cmd: 'calculate',
+        net: res.product.price
+      }, next)
+    }],
+    event: ['customer', 'product', 'taxes', (res, next) => {
+      const events = applyOrderCommand(res.customer, res.product, res.taxes.total)
       next(null, events)
     }],
     apply: ['event', (res, next) => {
