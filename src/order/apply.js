@@ -9,6 +9,9 @@ function apply(current, event) {
       return orderCreated(current, event)
     case EVENTS.ORDER_CONFIRMED:
       return orderConfirmed(current, event)
+    case EVENTS.INVOICE_CREATED: {
+      return Object.assign({}, current, { invoice: event.id })
+    }
     default:
       //eslint-disable-next-line 
       console.warn(`Event ${event.type} not found`)

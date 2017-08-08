@@ -6,9 +6,11 @@ const applyInvoiceCreated = require('../events/invoice-created')
 
 
 function createInvoiceFromOrder({ id, customer, product }) {
+  const invoiceId = uuid.v4()
   const invoiceCreated = {
     type: EVENTS.INVOICE_CREATED,
-    id: uuid.v4(),
+    id: invoiceId,
+    invoice: invoiceId,
     order: id,
     customer,
     product,
@@ -21,17 +23,20 @@ const pattern = {
   topic: 'order',
   type: ORDER_EVENTS.ORDER_CREATED,
   event: Joi.object().keys({
-    customer: Joi.object(),
-    product: Joi.object()
-  })
+    customer: Joi.object().required(),
+    product: Joi.object().required()
+  }).required()
 }
 
 function handler(msg, reply) {
   const event = createInvoiceFromOrder(msg.event)
   const applied = applyInvoiceCreated({}, event)
   this.act({ topic: 'events', cmd: 'add', events: event }, (err, res) => {
-    if (err) return reply(err)
-    reply(null, {
+    if (err) {
+      this.log.error(err)
+      return reply && reply(err)
+    }
+    reply && reply(null, {
       event,
       apply: applied,
       commit: res

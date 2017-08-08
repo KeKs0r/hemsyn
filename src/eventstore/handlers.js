@@ -35,7 +35,7 @@ function initEvents(options, next) {
       reply(null, { success: true })
       try {
         events.forEach(e => {
-          const topic = e.type.split('.')[0]
+          const topic = e.type.split('.')[0].toLowerCase()
           const publishEvent = {
             topic,
             type: e.type,

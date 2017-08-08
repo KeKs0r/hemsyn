@@ -12,9 +12,11 @@ const pattern = {
 }
 
 function applyOrderCommand(customer, product) {
+  const id = uuid.v4();
   const orderCreated = {
     type: EVENTS.ORDER_CREATED,
-    id: uuid.v4(),
+    id,
+    order: id,
     customer,
     product
   }

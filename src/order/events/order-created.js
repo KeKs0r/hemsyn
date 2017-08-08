@@ -1,6 +1,6 @@
 const { STATUS } = require('../constants')
 
-function applyOrderCreated (current, event) {
+function applyOrderCreated(current, event) {
   const order = {
     id: event.id,
     // prices: prices(action),

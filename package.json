@@ -7,7 +7,7 @@
   "license": "ISC",
   "scripts": {
     "start": "echo 'to be defined'",
-    "test": "mocha src --recursive",
+    "test": "mocha \"src/**/*.spec.js\"",
     "lint": "eslint .",
     "commit-check": "npm run lint && npm run test"
   },
