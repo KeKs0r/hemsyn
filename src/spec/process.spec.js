@@ -25,7 +25,6 @@ before(done => {
     const nats = require('nats').connect(NATS_PORT)
     h = new Hemera(nats, {
       logLevel: 'error',
-      generators: true,
       errio: {
         include: ['_pattern']
       }

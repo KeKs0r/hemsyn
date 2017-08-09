@@ -13,7 +13,6 @@ before(done => {
     const nats = require('nats').connect(NATS_PORT)
     h = new Hemera(nats, {
       logLevel: 'silent',
-      generators: true
     })
     h.use(eventStore)
     h.use(require('../../command/get-order'))
