@@ -18,8 +18,7 @@ before(done => {
     if (err) return done(err)
     const nats = require('nats').connect(NATS_PORT)
     h = new Hemera(nats, {
-      logLevel: 'silent',
-      generators: true
+      logLevel: 'silent'
     })
     h.use(createInvoiceFromOrder)
     h.use(eventStore)

@@ -8,7 +8,6 @@ const orderService = require('./order/attach')
 
 
 const h = new Hemera(nats, {
-  generators: true,
   errio: {
     include: ['_pattern']
   }

@@ -19,8 +19,7 @@ before(done => {
     if (err) return done(err)
     const nats = require('nats').connect(NATS_PORT)
     h = new Hemera(nats, {
-      logLevel: 'error',
-      generators: true
+      logLevel: 'error'
     })
     h.use(createOrder)
     h.use(eventStore)
