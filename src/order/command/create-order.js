@@ -27,6 +27,7 @@ function applyOrderCommand(customer, product, total) {
 function handler(msg, reply) {
   Async.auto({
     customer: (next) => {
+      console.log('customer - get')
       this.act({
         topic: 'customer',
         cmd: 'get',

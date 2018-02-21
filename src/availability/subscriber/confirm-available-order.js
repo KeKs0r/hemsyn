@@ -12,6 +12,7 @@ const pattern = {
 }
 
 function handler(msg, reply) {
+  console.log('subscription handler')
   const { event } = msg;
   const { product, order } = event
   this.act({
@@ -40,6 +41,7 @@ function handler(msg, reply) {
 
 function init(options, next) {
   this.add(pattern, handler)
+  console.log('confirm-available-order')
   next && next()
 }
 
@@ -48,6 +50,6 @@ module.exports = {
   handler,
   plugin: init,
   attributes: {
-    name: 'create-invoice-from-order'
+    name: 'confirm-available-order'
   }
 }

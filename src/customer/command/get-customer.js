@@ -14,6 +14,7 @@ function handler(msg, reply) {
 }
 
 function init(options, next) {
+  console.log('adding get-cusomer pattern')
   this.add(pattern, handler)
   next && next()
 }

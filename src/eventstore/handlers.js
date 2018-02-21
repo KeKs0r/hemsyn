@@ -42,7 +42,9 @@ function initEvents(options, next) {
             pubsub$: true,
             event: e
           }
-          if (size(this.list(publishEvent)) > 0) {
+          const listenerCount = size(this.list(publishEvent))
+          //console.log('Listeners for', e.type, 'Count', listenerCount)
+          if (listenerCount > 0) {
             this.act(publishEvent)
           }
         })
